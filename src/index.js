@@ -1,6 +1,6 @@
 import "./css/base.css";
 
-import { getTasks, addTask, getNextTaskId } from "./js/tasks";
+import { getTasks, addTask, getNextTaskId, editTask } from "./js/tasks";
 /*
   1. Ocultar las secciones main y footer
 Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocultos. ✅
@@ -12,9 +12,9 @@ Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocult
   - Asegúrate de usar métodos como .trim() para limpiar espacios al inicio o al final y verifica que la tarea no sea un string vacío. ✅
 
   3 Una tarea debería tener 3 posibles interacciones:
-  - Cuando se haga clic en el checkbox las tareas es marcada como completed, de igual manera si se vuele a hacer clic sobre en el checkbox vuelve a su estado de pending.
+  - Cuando se haga clic en el checkbox las tareas es marcada como completed, de igual manera si se vuele a hacer clic sobre en el checkbox vuelve a su estado de pending. ✅
   - Si se hace doble clic en el  <label> se activa el modo edición.
-  - Si se hace la acción :hover en una tarea se debería mostrar el botón para eliminar (.destroy).
+  - Si se hace la acción :hover en una tarea se debería mostrar el botón para eliminar (.destroy). ✅
 */
 
 const initUiApp = () => {
@@ -56,8 +56,16 @@ const initInitialEvents = () => {
 
 // functions for events
 
-// UI(render and craete) functions
+const handleChangeCheckTask = (task, currentCheck) => {
+  const editedTask = {
+    ...task,
+    completed: currentCheck,
+  };
+  editTask(task.id, editedTask);
+  initUiApp();
+};
 
+// UI(render and craete) functions
 const createTaskElement = (task) => {
   const taskItem = document.createElement("li");
   taskItem.id = task.id;
@@ -71,6 +79,10 @@ const createTaskElement = (task) => {
   checkBoxTask.type = "checkbox";
   checkBoxTask.checked = task.completed;
   checkBoxTask.classList.add("toggle");
+  checkBoxTask.addEventListener("change", (e) =>
+    handleChangeCheckTask(task, e.target.checked)
+  );
+
   const labelTask = document.createElement("label");
   labelTask.textContent = task.title;
   const deleteTaskBtn = document.createElement("button");
