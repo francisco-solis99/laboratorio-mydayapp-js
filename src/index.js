@@ -8,8 +8,13 @@ Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocult
   2 . Crear una nueva tarea.
   - Se debe crear una nueva tarea se debe usar el input principal de la aplicación.
   - Este input debe enfocarse cuando se cargue la página, preferiblemente utilizando el atributo autofocus en el input. ✅
-  - Al presionar la tecla Enter la tarea se crea con el estado pending y se agrega a la lista de tareas y el input debería quedar en limpio.
-  - Asegúrate de usar métodos como .trim() para limpiar espacios al inicio o al final y verifica que la tarea no sea un string vacío.
+  - Al presionar la tecla Enter la tarea se crea con el estado pending y se agrega a la lista de tareas y el input debería quedar en limpio. ✅
+  - Asegúrate de usar métodos como .trim() para limpiar espacios al inicio o al final y verifica que la tarea no sea un string vacío. ✅
+
+  3 Una tarea debería tener 3 posibles interacciones:
+  - Cuando se haga clic en el checkbox las tareas es marcada como completed, de igual manera si se vuele a hacer clic sobre en el checkbox vuelve a su estado de pending.
+  - Si se hace doble clic en el  <label> se activa el modo edición.
+  - Si se hace la acción :hover en una tarea se debería mostrar el botón para eliminar (.destroy).
 */
 
 const initUiApp = () => {
@@ -23,6 +28,11 @@ const initUiApp = () => {
   }
   mainEl.style.display = "block";
   footerEl.style.display = "block";
+  // udpate footer
+  const itemsLeftElement = document.querySelector(".todo-count");
+  itemsLeftElement.textContent = `${tasks.length} ${
+    tasks.length === 1 ? "item" : "items"
+  } left`;
   renderTasks({ tasks: tasks, containerSelector: ".todo-list" });
 };
 
