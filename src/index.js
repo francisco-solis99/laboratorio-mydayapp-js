@@ -1,6 +1,12 @@
 import "./css/base.css";
 
-import { getTasks, addTask, getNextTaskId, editTask } from "./js/tasks";
+import {
+  getTasks,
+  addTask,
+  getNextTaskId,
+  editTask,
+  deleteTask,
+} from "./js/tasks";
 /*
   1. Ocultar las secciones main y footer
 Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocultos. ✅
@@ -24,8 +30,16 @@ Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocult
 
   5 Contador
   - En el footer se debería mostrar el número de tareas en estado pending. ✅
-  - Asegúrese de que el número esté envuelto por una etiqueta <strong>.
+  - Asegúrese de que el número esté envuelto por una etiqueta <strong>. ✅
   - También asegúrese de pluralizar la palabra item correctamente, por ejemplo: 0 items, 1 item, 2 items. ✅
+
+  6 Botón de limpiar
+  - Debería existir un botón para eliminar todas las tareas que están con estado de completed.
+
+  7 Persistencia
+  - Cuando se recargue la aplicación se debe obtener las tareas, para esto tu aplicación debería guardar las tareas en LocalStorage. ✅
+  - El key que se debe usar para el LocalStorage debe ser mydayapp-js, esto es importante ya que las pruebas e2e van a verificar el LocalStorage con esta la key mydayapp-js. ✅
+  - NO es necesario persistir estados de la interfaz como por ejemplo guardar el modo de edición. Solo se debe guardar las tareas. ✅
 */
 
 const initUiApp = () => {
@@ -42,7 +56,7 @@ const initUiApp = () => {
   // udpate footer
   const itemsLeftElement = document.querySelector(".todo-count");
   const numTasksDone = tasks.filter((task) => !task.completed).length;
-  itemsLeftElement.textContent = `${numTasksDone} ${
+  itemsLeftElement.innerHTML = `<strong>${numTasksDone}</strong> ${
     numTasksDone === 1 ? "item" : "items"
   } left`;
   renderTasks({ tasks: tasks, containerSelector: ".todo-list" });
@@ -88,6 +102,11 @@ const handleChangeEdit = (editTitle, task) => {
   initUiApp();
 };
 
+const handleClickDelete = (idTask) => {
+  deleteTask(idTask);
+  initUiApp();
+};
+
 // UI(render and craete) functions
 const createTaskElement = (task) => {
   const taskItem = document.createElement("li");
@@ -129,6 +148,9 @@ const createTaskElement = (task) => {
     handleChangeEdit(e.target.value, task);
   });
 
+  deleteTaskBtn.addEventListener("click", () => handleClickDelete(task.id));
+
+  // render
   innerWrapper.append(checkBoxTask, labelTask, deleteTaskBtn);
   taskItem.append(innerWrapper, inputTask);
   return taskItem;
