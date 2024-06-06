@@ -6,6 +6,7 @@ import {
   getNextTaskId,
   editTask,
   deleteTask,
+  getTasksByState,
 } from "./js/tasks";
 /*
   1. Ocultar las secciones main y footer
@@ -34,12 +35,19 @@ Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocult
   - También asegúrese de pluralizar la palabra item correctamente, por ejemplo: 0 items, 1 item, 2 items. ✅
 
   6 Botón de limpiar
-  - Debería existir un botón para eliminar todas las tareas que están con estado de completed.
+  - Debería existir un botón para eliminar todas las tareas que están con estado de completed. ✅
 
   7 Persistencia
   - Cuando se recargue la aplicación se debe obtener las tareas, para esto tu aplicación debería guardar las tareas en LocalStorage. ✅
   - El key que se debe usar para el LocalStorage debe ser mydayapp-js, esto es importante ya que las pruebas e2e van a verificar el LocalStorage con esta la key mydayapp-js. ✅
-  - NO es necesario persistir estados de la interfaz como por ejemplo guardar el modo de edición. Solo se debe guardar las tareas. ✅
+  - NO es necesario persistir estados de la interfaz como por ejemplo guardar el modo de edición. Solo se debe guardar las tareas.
+
+  8 Filtros y rutas
+  Deben existir tres filtros que funcione desde la URL y funcionan como links en el footer:
+
+  -#/all: Muestra todas las tareas tanto las que están en estado de completed y pending.
+  -#/pending: Muestra todas las tareas en estado pending.
+  -#/completed: Muestra todas las tareas en estado completed.
 */
 
 const initUiApp = () => {
@@ -64,23 +72,40 @@ const initUiApp = () => {
 
 const initInitialEvents = () => {
   const principalInput = document.querySelector(".new-todo");
+  const clearDoneBtn = document.querySelector(".clear-completed");
+
   principalInput.addEventListener("keydown", (e) => {
     if (e.code !== "Enter") return;
-    const taskTitle = e.target.value.trim();
-    if (taskTitle === "") return;
-    const nexTaskId = getNextTaskId();
-    const newTask = {
-      id: nexTaskId,
-      title: taskTitle,
-      completed: false,
-    };
-    addTask(newTask);
-    initUiApp();
+    handleKeyDownCreateTask(e.target.value);
     e.target.value = "";
   });
+
+  clearDoneBtn.addEventListener("click", handleClickCleanTasksDone);
 };
 
 // functions for events
+
+const handleKeyDownCreateTask = (taskTitle) => {
+  const taskTitleCleaned = taskTitle.trim();
+  if (taskTitleCleaned === "") return;
+  const nexTaskId = getNextTaskId();
+  const newTask = {
+    id: nexTaskId,
+    title: taskTitleCleaned,
+    completed: false,
+  };
+  addTask(newTask);
+  initUiApp();
+};
+
+const handleClickCleanTasksDone = () => {
+  const doneTasks = getTasksByState({ completedState: true });
+
+  doneTasks.forEach((task) => {
+    deleteTask(task.id);
+  });
+  initUiApp();
+};
 
 const handleChangeCheckTask = (task, currentCheck) => {
   const editedTask = {

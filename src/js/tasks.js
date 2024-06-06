@@ -4,7 +4,7 @@ const { item } = getTasksFromLocalStorage({ itemName: "mydayapp-js" });
 
 const tasks = item ?? [];
 
-const getTasks = () => tasks;
+const getTasks = () => [...tasks];
 
 const addTask = (task) => {
   tasks.push(task);
@@ -21,6 +21,12 @@ const editTask = (idTask, taskEdited) => {
   const taskIndex = tasks.findIndex((task) => task.id === idTask);
   tasks[taskIndex] = taskEdited;
   saveTasksForLocalStorage({ tasks, itemName: "mydayapp-js" });
+};
+
+export const getTasksByState = ({ completedState = null }) => {
+  if (completedState === null) return [...tasks];
+
+  return tasks.filter((task) => task.completed === completedState);
 };
 
 const getNextTaskId = () => {
