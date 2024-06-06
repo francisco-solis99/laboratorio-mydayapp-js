@@ -40,21 +40,21 @@ Cuando no hay tareas, los elementos con ID #main y #footer deberían estar ocult
   7 Persistencia
   - Cuando se recargue la aplicación se debe obtener las tareas, para esto tu aplicación debería guardar las tareas en LocalStorage. ✅
   - El key que se debe usar para el LocalStorage debe ser mydayapp-js, esto es importante ya que las pruebas e2e van a verificar el LocalStorage con esta la key mydayapp-js. ✅
-  - NO es necesario persistir estados de la interfaz como por ejemplo guardar el modo de edición. Solo se debe guardar las tareas.
+  - NO es necesario persistir estados de la interfaz como por ejemplo guardar el modo de edición. Solo se debe guardar las tareas. ✅
 
   8 Filtros y rutas
   Deben existir tres filtros que funcione desde la URL y funcionan como links en el footer:
 
-  -#/all: Muestra todas las tareas tanto las que están en estado de completed y pending.
-  -#/pending: Muestra todas las tareas en estado pending.
-  -#/completed: Muestra todas las tareas en estado completed.
+  -#/all: Muestra todas las tareas tanto las que están en estado de completed y pending. ✅
+  -#/pending: Muestra todas las tareas en estado pending.  ✅
+  -#/completed: Muestra todas las tareas en estado completed. ✅
 */
 
-const initUiApp = () => {
-  const tasks = getTasks();
+const initUiApp = ({ filterStatus = null } = {}) => {
+  const tasks = getTasks({ statusComplete: filterStatus });
   const mainEl = document.querySelector(".main");
   const footerEl = document.querySelector(".footer");
-  if (!tasks?.length) {
+  if (!tasks?.length && filterStatus === null) {
     mainEl.style.display = "none";
     footerEl.style.display = "none";
     return;
@@ -63,10 +63,18 @@ const initUiApp = () => {
   footerEl.style.display = "block";
   // udpate footer
   const itemsLeftElement = document.querySelector(".todo-count");
-  const numTasksDone = tasks.filter((task) => !task.completed).length;
-  itemsLeftElement.innerHTML = `<strong>${numTasksDone}</strong> ${
-    numTasksDone === 1 ? "item" : "items"
+  const clearDoneBtn = document.querySelector(".clear-completed");
+
+  const numTasksToDone = tasks.filter((task) => !task.completed).length;
+  itemsLeftElement.innerHTML = `<strong>${numTasksToDone}</strong> ${
+    numTasksToDone === 1 ? "item" : "items"
   } left`;
+  if (numTasksToDone === tasks.length) {
+    clearDoneBtn.style.visibility = "hidden";
+  } else {
+    clearDoneBtn.style.visibility = "visible";
+  }
+
   renderTasks({ tasks: tasks, containerSelector: ".todo-list" });
 };
 
@@ -81,9 +89,34 @@ const initInitialEvents = () => {
   });
 
   clearDoneBtn.addEventListener("click", handleClickCleanTasksDone);
+
+  window.addEventListener("hashchange", initTasksToApp);
 };
 
 // functions for events
+
+const initTasksToApp = () => {
+  const hashChanged = window.location.hash === "" ? "#/" : window.location.hash;
+  const filterTasksObjCallBacks = {
+    "#/": () => initUiApp(),
+    "#/pending": () => initUiApp({ filterStatus: false }),
+    "#/completed": () => initUiApp({ filterStatus: true }),
+  };
+
+  const filtersTags = document.querySelectorAll(".filters a");
+
+  filtersTags.forEach((filter) => {
+    const hashFilter = new URL(filter.href).hash;
+    if (hashFilter === hashChanged) {
+      filter.classList.add("selected");
+      return;
+    }
+    filter.classList.remove("selected");
+  });
+
+  const callbackFilter = filterTasksObjCallBacks[hashChanged];
+  callbackFilter();
+};
 
 const handleKeyDownCreateTask = (taskTitle) => {
   const taskTitleCleaned = taskTitle.trim();
@@ -193,7 +226,8 @@ const renderTasks = ({ tasks, containerSelector }) => {
 };
 
 function mainUi() {
-  initUiApp();
+  // const currentHash = window.location.hash;
+  initTasksToApp();
   initInitialEvents();
 }
 

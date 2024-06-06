@@ -4,7 +4,14 @@ const { item } = getTasksFromLocalStorage({ itemName: "mydayapp-js" });
 
 const tasks = item ?? [];
 
-const getTasks = () => [...tasks];
+const getTasks = ({ statusComplete = null } = {}) => {
+  if (statusComplete === null) return [...tasks];
+  const tasksFiltered = [...tasks].filter((task) => {
+    return task.completed === statusComplete;
+  });
+
+  return tasksFiltered;
+};
 
 const addTask = (task) => {
   tasks.push(task);
