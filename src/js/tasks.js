@@ -25,8 +25,7 @@ const editTask = (idTask, taskEdited) => {
 
 const getNextTaskId = () => {
   const numId = (tasks.at(-1)?.id ?? 0) + 1;
-  const nextIdTask = `task-${numId}`;
-  return nextIdTask;
+  return numId;
 };
 
 export { getTasks, addTask, deleteTask, editTask, getNextTaskId };
